@@ -1,10 +1,10 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
 const api = axios.create({
   baseURL: '/api',
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('accessToken');
     if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -13,8 +13,8 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (res) => res,
-  async (error) => {
+  (res: AxiosResponse) => res,
+  async (error: AxiosError) => {
     const original = error.config;
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
