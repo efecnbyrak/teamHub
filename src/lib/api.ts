@@ -1,5 +1,9 @@
 import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
+interface RetryConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
 const api = axios.create({
   baseURL: '/api',
 });
@@ -15,8 +19,8 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
   (res: AxiosResponse) => res,
   async (error: AxiosError) => {
-    const original = error.config;
-    if (error.response?.status === 401 && !original._retry) {
+    const original = error.config as RetryConfig | undefined;
+    if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
       const refreshToken = localStorage.getItem('refreshToken');
       if (refreshToken) {
