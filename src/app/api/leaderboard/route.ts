@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
     });
     const xpMap = new Map<string, number>();
     for (const tx of transactions) xpMap.set(tx.userId, (xpMap.get(tx.userId) || 0) + tx.amount);
-    const users = await prisma.user.findMany({
+    const users: { id: string; name: string | null; avatar: string | null; level: number }[] = await prisma.user.findMany({
       where: { id: { in: Array.from(xpMap.keys()) } },
       select: { id: true, name: true, avatar: true, level: true },
     });
