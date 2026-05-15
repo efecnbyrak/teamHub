@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ leaderboard });
   }
 
-  const users = await prisma.user.findMany({
+  const users: { id: string; name: string | null; avatar: string | null; xp: number; level: number }[] = await prisma.user.findMany({
     orderBy: { xp: 'desc' },
     take: 50,
     select: { id: true, name: true, avatar: true, xp: true, level: true },
