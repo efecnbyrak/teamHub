@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     for (const task of tasks) {
       if (task.assignedTo) xpMap.set(task.assignedTo, (xpMap.get(task.assignedTo) || 0) + task.xpReward);
     }
-    const users = await prisma.user.findMany({
+    const users: { id: string; name: string | null; avatar: string | null; level: number }[] = await prisma.user.findMany({
       where: { id: { in: Array.from(xpMap.keys()) } },
       select: { id: true, name: true, avatar: true, level: true },
     });
