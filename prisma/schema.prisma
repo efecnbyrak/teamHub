@@ -36,6 +36,7 @@ model Project {
   ownerId     String
   inviteToken String   @unique @default(uuid())
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   owner       User            @relation("owner", fields: [ownerId], references: [id])
   members     ProjectMember[]
@@ -68,6 +69,7 @@ model Task {
   deadline    DateTime?
   completedAt DateTime?
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   assignee User?   @relation("assignee", fields: [assignedTo], references: [id])
@@ -102,6 +104,7 @@ model Team {
   description String?
   createdBy   String
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   creator  User          @relation("teamCreator", fields: [createdBy], references: [id])
   members  TeamMember[]

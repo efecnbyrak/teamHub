@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [form, setForm] = useState({ email: "", password: "" });
 
   async function handleSubmit(e: React.FormEvent) {
@@ -21,8 +23,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { data } = await api.post("/auth/login", form);
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("refreshToken", data.refreshToken);
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem("accessToken", data.accessToken);
+      storage.setItem("refreshToken", data.refreshToken);
       setUser(data.user);
       router.push("/dashboard");
     } catch (err: unknown) {
@@ -63,6 +66,16 @@ export default function LoginPage() {
                 onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                 required
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="rememberMe"
+                checked={rememberMe}
+                onCheckedChange={(v) => setRememberMe(!!v)}
+              />
+              <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer select-none">
+                Beni Hatırla
+              </Label>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Giriş yapılıyor..." : "Giriş Yap"}

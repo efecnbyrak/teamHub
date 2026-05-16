@@ -19,7 +19,19 @@ async function main() {
     },
   });
 
-  console.log('Süper admin oluşturuldu: phyberk@superadmin.com');
+  // efecanbayrak3557@gmail.com kullanıcısını super_admin yap
+  const efeca = await prisma.user.findUnique({ where: { email: 'efecanbayrak3557@gmail.com' } });
+  if (efeca) {
+    await prisma.user.update({
+      where: { email: 'efecanbayrak3557@gmail.com' },
+      data: { role: 'super_admin' },
+    });
+    console.log('efecanbayrak3557@gmail.com → super_admin yapıldı');
+  } else {
+    console.log('efecanbayrak3557@gmail.com bulunamadı, kayıt yoksa önce register olun');
+  }
+
+  console.log('Seed tamamlandı.');
 }
 
 main()
