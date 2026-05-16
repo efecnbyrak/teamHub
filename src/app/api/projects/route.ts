@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       ownerId: userId,
       members: { create: { userId, role: 'owner' } },
     },
-    include: { owner: { select: { id: true, name: true, avatar: true } } },
+    include: { owner: { select: { id: true, firstName: true, lastName: true, avatar: true } } },
   });
 
   return NextResponse.json({ project }, { status: 201 });
