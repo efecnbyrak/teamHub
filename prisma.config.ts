@@ -6,5 +6,6 @@ export default defineConfig({
   schema: './prisma/schema.prisma',
   datasource: {
     adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL! }),
+    url: process.env.DATABASE_URL!,
   },
 });
