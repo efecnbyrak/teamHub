@@ -63,7 +63,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-2xl font-bold">Merhaba, {user?.name?.split(" ")[0]} 👋</h1>
+        <h1 className="text-2xl font-bold">Merhaba, {user?.firstName} 👋</h1>
         <p className="text-muted-foreground mt-1">İşte bugün seni bekleyenler.</p>
       </div>
 
