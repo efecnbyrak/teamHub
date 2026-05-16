@@ -8,20 +8,25 @@ datasource db {
 
 model User {
   id           String   @id @default(uuid())
-  name         String
+  firstName    String
+  lastName     String
   email        String   @unique
   passwordHash String
+  gorev        String?
+  role         String   @default("user")
   avatar       String?
   xp           Int      @default(0)
   level        Int      @default(1)
   createdAt    DateTime @default(now())
 
-  ownedProjects  Project[]       @relation("owner")
-  memberships    ProjectMember[]
-  assignedTasks  Task[]          @relation("assignee")
-  createdTasks   Task[]          @relation("creator")
-  xpTransactions XpTransaction[]
-  notifications  Notification[]
+  ownedProjects   Project[]       @relation("owner")
+  memberships     ProjectMember[]
+  assignedTasks   Task[]          @relation("assignee")
+  createdTasks    Task[]          @relation("creator")
+  xpTransactions  XpTransaction[]
+  notifications   Notification[]
+  createdTeams    Team[]          @relation("teamCreator")
+  teamMemberships TeamMember[]
 }
 
 model Project {
@@ -32,9 +37,10 @@ model Project {
   inviteToken String   @unique @default(uuid())
   createdAt   DateTime @default(now())
 
-  owner   User            @relation("owner", fields: [ownerId], references: [id])
-  members ProjectMember[]
-  tasks   Task[]
+  owner       User            @relation("owner", fields: [ownerId], references: [id])
+  members     ProjectMember[]
+  tasks       Task[]
+  teamProjects TeamProject[]
 }
 
 model ProjectMember {
@@ -88,4 +94,38 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Team {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  creator  User          @relation("teamCreator", fields: [createdBy], references: [id])
+  members  TeamMember[]
+  projects TeamProject[]
+}
+
+model TeamMember {
+  teamId   String
+  userId   String
+  role     String   @default("member")
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+}
+
+model TeamProject {
+  teamId    String
+  projectId String
+
+  team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, projectId])
 }

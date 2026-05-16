@@ -1,0 +1,30 @@
+import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { getUserId, unauthorized } from '@/lib/auth';
+
+async function requireSuperAdmin(req: NextRequest) {
+  const userId = getUserId(req);
+  if (!userId) return null;
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+  if (user?.role !== 'super_admin') return null;
+  return userId;
+}
+
+export async function GET(req: NextRequest) {
+  if (!await requireSuperAdmin(req)) return unauthorized();
+
+  const [userCount, projectCount, taskCount, teamCount] = await Promise.all([
+    prisma.user.count(),
+    prisma.project.count(),
+    prisma.task.count(),
+    prisma.team.count(),
+  ]);
+
+  const recentUsers = await prisma.user.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+    select: { id: true, firstName: true, lastName: true, email: true, gorev: true, role: true, createdAt: true },
+  });
+
+  return NextResponse.json({ userCount, projectCount, taskCount, teamCount, recentUsers });
+}

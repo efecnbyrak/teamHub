@@ -16,14 +16,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const project = await prisma.project.findUnique({
     where: { id },
     include: {
-      owner: { select: { id: true, name: true, avatar: true } },
+      owner: { select: { id: true, firstName: true, lastName: true, avatar: true } },
       members: {
-        include: { user: { select: { id: true, name: true, avatar: true, xp: true, level: true } } },
+        include: { user: { select: { id: true, firstName: true, lastName: true, avatar: true, xp: true, level: true } } },
       },
       tasks: {
         include: {
-          assignee: { select: { id: true, name: true, avatar: true } },
-          creator: { select: { id: true, name: true } },
+          assignee: { select: { id: true, firstName: true, lastName: true, avatar: true } },
+          creator: { select: { id: true, firstName: true, lastName: true } },
         },
         orderBy: { createdAt: 'desc' },
       },

@@ -21,7 +21,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const updated = await prisma.task.update({
     where: { id },
     data: { assignedTo },
-    include: { assignee: { select: { id: true, name: true, avatar: true } } },
+    include: { assignee: { select: { id: true, firstName: true, lastName: true, avatar: true } } },
   });
 
   if (assignedTo && assignedTo !== userId) {

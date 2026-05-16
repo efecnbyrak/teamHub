@@ -129,7 +129,7 @@ export default function ProjectDetailPage() {
                   <SelectTrigger><SelectValue placeholder="Seç (isteğe bağlı)" /></SelectTrigger>
                   <SelectContent>
                     {project.members.map((m) => (
-                      <SelectItem key={m.user.id} value={m.user.id}>{m.user.name}</SelectItem>
+                      <SelectItem key={m.user.id} value={m.user.id}>{m.user.firstName} {m.user.lastName}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -166,7 +166,7 @@ export default function ProjectDetailPage() {
                     </div>
                     {task.assignee && (
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <User className="h-3 w-3" />{task.assignee.name}
+                        <User className="h-3 w-3" />{task.assignee.firstName} {task.assignee.lastName}
                       </div>
                     )}
                     <div className="flex gap-1 flex-wrap">

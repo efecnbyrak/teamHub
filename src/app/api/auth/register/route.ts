@@ -4,10 +4,29 @@ import prisma from '@/lib/prisma';
 import { signTokens } from '@/lib/auth';
 
 export async function POST(req: NextRequest) {
-  const { name, email, password } = await req.json() as { name: string; email: string; password: string };
+  const { firstName, lastName, email, password, gorev } = await req.json() as {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    gorev: string;
+  };
 
-  if (!name || !email || !password) {
-    return NextResponse.json({ error: 'Ad, e-posta ve şifre zorunludur' }, { status: 400 });
+  if (!firstName || !lastName || !email || !password || !gorev) {
+    return NextResponse.json({ error: 'Tüm alanlar zorunludur' }, { status: 400 });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return NextResponse.json({ error: 'Geçerli bir e-posta adresi girin' }, { status: 400 });
+  }
+
+  if (password.length < 6) {
+    return NextResponse.json({ error: 'Şifre en az 6 karakter olmalı' }, { status: 400 });
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    return NextResponse.json({ error: 'Şifre en az bir büyük harf içermeli' }, { status: 400 });
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -17,8 +36,8 @@ export async function POST(req: NextRequest) {
 
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.create({
-    data: { name, email, passwordHash },
-    select: { id: true, name: true, email: true, xp: true, level: true },
+    data: { firstName, lastName, email, passwordHash, gorev },
+    select: { id: true, firstName: true, lastName: true, email: true, gorev: true, role: true, xp: true, level: true },
   });
 
   const tokens = signTokens(user.id);

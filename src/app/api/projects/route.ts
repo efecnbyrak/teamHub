@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
       project: {
         include: {
           _count: { select: { tasks: true, members: true } },
-          owner: { select: { id: true, name: true, avatar: true } },
+          owner: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
     },

@@ -24,12 +24,12 @@ export async function GET(req: NextRequest) {
     for (const task of tasks) {
       if (task.assignedTo) xpMap.set(task.assignedTo, (xpMap.get(task.assignedTo) || 0) + task.xpReward);
     }
-    const users: { id: string; name: string | null; avatar: string | null; level: number }[] = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       where: { id: { in: Array.from(xpMap.keys()) } },
-      select: { id: true, name: true, avatar: true, level: true },
+      select: { id: true, firstName: true, lastName: true, avatar: true, level: true },
     });
     const leaderboard = users
-      .map((u) => ({ ...u, periodXp: xpMap.get(u.id) || 0, taskCount: 0 }))
+      .map((u) => ({ ...u, name: `${u.firstName} ${u.lastName}`, periodXp: xpMap.get(u.id) || 0, taskCount: 0 }))
       .sort((a, b) => b.periodXp - a.periodXp);
     return NextResponse.json({ leaderboard });
   }
@@ -41,21 +41,21 @@ export async function GET(req: NextRequest) {
     });
     const xpMap = new Map<string, number>();
     for (const tx of transactions) xpMap.set(tx.userId, (xpMap.get(tx.userId) || 0) + tx.amount);
-    const users: { id: string; name: string | null; avatar: string | null; level: number }[] = await prisma.user.findMany({
+    const users = await prisma.user.findMany({
       where: { id: { in: Array.from(xpMap.keys()) } },
-      select: { id: true, name: true, avatar: true, level: true },
+      select: { id: true, firstName: true, lastName: true, avatar: true, level: true },
     });
     const leaderboard = users
-      .map((u) => ({ ...u, periodXp: xpMap.get(u.id) || 0 }))
+      .map((u) => ({ ...u, name: `${u.firstName} ${u.lastName}`, periodXp: xpMap.get(u.id) || 0 }))
       .sort((a, b) => b.periodXp - a.periodXp)
       .slice(0, 50);
     return NextResponse.json({ leaderboard });
   }
 
-  const users: { id: string; name: string | null; avatar: string | null; xp: number; level: number }[] = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     orderBy: { xp: 'desc' },
     take: 50,
-    select: { id: true, name: true, avatar: true, xp: true, level: true },
+    select: { id: true, firstName: true, lastName: true, avatar: true, xp: true, level: true },
   });
-  return NextResponse.json({ leaderboard: users.map((u) => ({ ...u, periodXp: u.xp })) });
+  return NextResponse.json({ leaderboard: users.map((u) => ({ ...u, name: `${u.firstName} ${u.lastName}`, periodXp: u.xp })) });
 }

@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   const tokens = signTokens(user.id);
   return NextResponse.json({
-    user: { id: user.id, name: user.name, email: user.email, xp: user.xp, level: user.level, avatar: user.avatar },
+    user: { id: user.id, firstName: user.firstName, lastName: user.lastName, email: user.email, gorev: user.gorev, role: user.role, xp: user.xp, level: user.level, avatar: user.avatar },
     ...tokens,
   });
 }

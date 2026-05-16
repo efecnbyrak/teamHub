@@ -21,8 +21,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
   const tasks = await prisma.task.findMany({
     where: { projectId, ...(status ? { status } : {}), ...(assignedTo ? { assignedTo } : {}) },
     include: {
-      assignee: { select: { id: true, name: true, avatar: true } },
-      creator: { select: { id: true, name: true } },
+      assignee: { select: { id: true, firstName: true, lastName: true, avatar: true } },
+      creator: { select: { id: true, firstName: true, lastName: true } },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -56,8 +56,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
       deadline: deadline ? new Date(deadline) : undefined,
     },
     include: {
-      assignee: { select: { id: true, name: true, avatar: true } },
-      creator: { select: { id: true, name: true } },
+      assignee: { select: { id: true, firstName: true, lastName: true, avatar: true } },
+      creator: { select: { id: true, firstName: true, lastName: true } },
     },
   });
 

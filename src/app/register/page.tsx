@@ -10,21 +10,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function RegisterPage() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gorev: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  function set(field: string, value: string) {
+    setForm((f) => ({ ...f, [field]: value }));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (!EMAIL_REGEX.test(form.email)) {
+      toast.error("Geçerli bir e-posta adresi girin");
+      return;
+    }
     if (form.password.length < 6) {
       toast.error("Şifre en az 6 karakter olmalı");
       return;
     }
+    if (!/[A-Z]/.test(form.password)) {
+      toast.error("Şifre en az bir büyük harf içermeli");
+      return;
+    }
+    if (form.password !== form.confirmPassword) {
+      toast.error("Şifreler eşleşmiyor");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { data } = await api.post("/auth/register", form);
+      const { data } = await api.post("/auth/register", {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        password: form.password,
+        gorev: form.gorev,
+      });
       localStorage.setItem("accessToken", data.accessToken);
       localStorage.setItem("refreshToken", data.refreshToken);
       setUser(data.user);
@@ -46,16 +79,29 @@ export default function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Ad Soyad</Label>
-              <Input
-                id="name"
-                placeholder="Adın Soyadın"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                required
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">Ad</Label>
+                <Input
+                  id="firstName"
+                  placeholder="Adın"
+                  value={form.firstName}
+                  onChange={(e) => set("firstName", e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Soyad</Label>
+                <Input
+                  id="lastName"
+                  placeholder="Soyadın"
+                  value={form.lastName}
+                  onChange={(e) => set("lastName", e.target.value)}
+                  required
+                />
+              </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">E-posta</Label>
               <Input
@@ -63,21 +109,46 @@ export default function RegisterPage() {
                 type="email"
                 placeholder="ornek@mail.com"
                 value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                onChange={(e) => set("email", e.target.value)}
                 required
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="gorev">Görev</Label>
+              <Input
+                id="gorev"
+                placeholder="Yazılım Geliştirici, Tasarımcı..."
+                value={form.gorev}
+                onChange={(e) => set("gorev", e.target.value)}
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Şifre</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="En az 6 karakter"
+                placeholder="En az 6 karakter, 1 büyük harf"
                 value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                onChange={(e) => set("password", e.target.value)}
                 required
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Şifre Tekrar</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Şifreni tekrar gir"
+                value={form.confirmPassword}
+                onChange={(e) => set("confirmPassword", e.target.value)}
+                required
+              />
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Hesap oluşturuluyor..." : "Kayıt Ol"}
             </Button>

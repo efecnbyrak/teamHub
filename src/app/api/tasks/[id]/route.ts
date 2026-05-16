@@ -35,8 +35,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       completedAt,
     },
     include: {
-      assignee: { select: { id: true, name: true, avatar: true } },
-      creator: { select: { id: true, name: true } },
+      assignee: { select: { id: true, firstName: true, lastName: true, avatar: true } },
+      creator: { select: { id: true, firstName: true, lastName: true } },
     },
   });
 
