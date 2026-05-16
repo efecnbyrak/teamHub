@@ -14,11 +14,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
-interface Member { user: { id: string; name: string; avatar?: string } }
+interface Member { user: { id: string; firstName: string; lastName: string; avatar?: string } }
 interface Task {
   id: string; title: string; description?: string;
   status: string; priority: string; xpReward: number;
-  assignee?: { id: string; name: string } | null;
+  assignee?: { id: string; firstName: string; lastName: string } | null;
 }
 interface Project { id: string; name: string; description?: string; members: Member[]; tasks: Task[] }
 
