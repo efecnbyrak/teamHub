@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getUserId, unauthorized } from "@/lib/auth";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: taskId } = await params;
@@ -12,8 +12,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getAuthUser(req);
-  if (!user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const userId = getUserId(req);
+  if (!userId) return unauthorized();
 
   const { id: taskId } = await params;
   const { title } = await req.json();

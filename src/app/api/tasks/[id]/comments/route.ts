@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getAuthUser } from "@/lib/auth";
+import { getUserId, unauthorized } from "@/lib/auth";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: taskId } = await params;
   const comments = await prisma.comment.findMany({
     where: { taskId },
@@ -13,15 +13,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getAuthUser(req);
-  if (!user) return NextResponse.json({ error: "Yetkisiz" }, { status: 401 });
+  const userId = getUserId(req);
+  if (!userId) return unauthorized();
 
   const { id: taskId } = await params;
   const { content } = await req.json();
   if (!content?.trim()) return NextResponse.json({ error: "İçerik boş olamaz" }, { status: 400 });
 
   const comment = await prisma.comment.create({
-    data: { taskId, userId: user.id, content: content.trim() },
+    data: { taskId, userId, content: content.trim() },
     include: { author: { select: { id: true, firstName: true, lastName: true, avatar: true } } },
   });
   return NextResponse.json({ comment }, { status: 201 });
