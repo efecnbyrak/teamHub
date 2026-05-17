@@ -22,7 +22,12 @@ export default function TeamsLayout({ children }: { children: React.ReactNode })
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto p-6 bg-muted/20">{children}</main>
+      <main className="flex-1 overflow-y-auto flex flex-col bg-muted/20">
+        <div className="flex-1 p-6">{children}</div>
+        <footer className="border-t py-3 px-6 text-xs text-muted-foreground text-center">
+          © 2026 Efe Can Bayrak. Tüm hakları saklıdır.
+        </footer>
+      </main>
     </div>
   );
 }

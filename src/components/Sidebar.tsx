@@ -6,6 +6,7 @@ import {
   LayoutDashboard, Trophy, LogOut, FolderKanban,
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   ClipboardList, BarChart2, Eye, Users, Shield, Home,
+  Bell, Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -50,6 +51,7 @@ export default function Sidebar() {
   const [projectsOpen, setProjectsOpen] = useState(true);
   const [projects, setProjects] = useState<Project[]>([]);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     localStorage.setItem("sidebar-collapsed", String(collapsed));
@@ -59,6 +61,10 @@ export default function Sidebar() {
     api.get("/projects").then(({ data }) => {
       setProjects((data.projects ?? data).slice(0, 8));
     }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    api.get("/notifications").then(({ data }) => setUnreadCount(data.unreadCount ?? 0)).catch(() => {});
   }, []);
 
   function handleLogout() {
@@ -179,9 +185,33 @@ export default function Sidebar() {
             )}
           </div>
 
+          <NavItem href="/calendar" label="Takvim" icon={Calendar} />
           <NavItem href="/analytics" label="Analytics" icon={BarChart2} />
           <NavItem href="/views" label="Views" icon={Eye} />
           <NavItem href="/leaderboard" label="Leaderboard" icon={Trophy} />
+
+          {/* Bildirimler */}
+          <Link
+            href="/notifications"
+            title={collapsed ? "Bildirimler" : undefined}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors relative",
+              pathname === "/notifications" || pathname.startsWith("/notifications/")
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              collapsed && "justify-center px-2"
+            )}
+          >
+            <div className="relative shrink-0">
+              <Bell className="h-[18px] w-[18px]" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground text-[9px] font-bold rounded-full min-w-[14px] h-[14px] flex items-center justify-center px-0.5">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </div>
+            {!collapsed && <span className="truncate">Bildirimler</span>}
+          </Link>
 
           {/* Team */}
           <SectionHeader label="Team" />

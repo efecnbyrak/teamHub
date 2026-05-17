@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Plus, User } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -126,7 +127,14 @@ export default function ProjectDetailPage() {
               <div className="space-y-2">
                 <Label>Atanacak kişi</Label>
                 <Select value={form.assignedTo} onValueChange={(v) => setForm((f) => ({ ...f, assignedTo: v ?? "" }))}>
-                  <SelectTrigger><SelectValue placeholder="Seç (isteğe bağlı)" /></SelectTrigger>
+                  <SelectTrigger>
+                    <span className="flex flex-1 text-left text-sm">
+                      {form.assignedTo
+                        ? (() => { const m = project.members.find((mb) => mb.user.id === form.assignedTo); return m ? `${m.user.firstName} ${m.user.lastName}` : "Seç"; })()
+                        : <span className="text-muted-foreground">Seç (isteğe bağlı)</span>
+                      }
+                    </span>
+                  </SelectTrigger>
                   <SelectContent>
                     {project.members.map((m) => (
                       <SelectItem key={m.user.id} value={m.user.id}>{m.user.firstName} {m.user.lastName}</SelectItem>
@@ -169,7 +177,7 @@ export default function ProjectDetailPage() {
                         <User className="h-3 w-3" />{task.assignee.firstName} {task.assignee.lastName}
                       </div>
                     )}
-                    <div className="flex gap-1 flex-wrap">
+                    <div className="flex gap-1 flex-wrap items-center">
                       {COLUMNS.filter((c) => c.key !== col.key).map((c) => (
                         <Button
                           key={c.key}
@@ -181,6 +189,9 @@ export default function ProjectDetailPage() {
                           → {c.label}
                         </Button>
                       ))}
+                      <Link href={`/projects/${id}/tasks/${task.id}`} className="ml-auto text-xs text-primary hover:underline">
+                        Detay
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

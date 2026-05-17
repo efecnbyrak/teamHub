@@ -8,8 +8,9 @@ export async function GET(req: NextRequest) {
 
   const notifications = await prisma.notification.findMany({
     where: { userId },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ read: 'asc' }, { createdAt: 'desc' }],
     take: 50,
   });
-  return NextResponse.json({ notifications });
+  const unreadCount = await prisma.notification.count({ where: { userId, read: false } });
+  return NextResponse.json({ notifications, unreadCount });
 }

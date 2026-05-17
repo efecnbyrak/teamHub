@@ -4,6 +4,22 @@ import { getUserId, unauthorized } from '@/lib/auth';
 import { xpForPriority, awardXp } from '@/lib/xp';
 import { createNotification } from '@/lib/notifications';
 
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const userId = getUserId(req);
+  if (!userId) return unauthorized();
+
+  const { id } = await params;
+  const task = await prisma.task.findUnique({
+    where: { id },
+    include: {
+      assignee: { select: { id: true, firstName: true, lastName: true, avatar: true } },
+      creator: { select: { id: true, firstName: true, lastName: true } },
+    },
+  });
+  if (!task) return NextResponse.json({ error: 'Görev bulunamadı' }, { status: 404 });
+  return NextResponse.json({ task });
+}
+
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const userId = getUserId(req);
   if (!userId) return unauthorized();
