@@ -30,7 +30,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     },
   });
 
-  return NextResponse.json({ project });
+  // Kullanıcının bu projedeki efektif rolü: proje sahibi → owner,
+  // takım admin/owner → admin, diğer → member
+  let myRole: 'owner' | 'admin' | 'member' = membership.role as 'owner' | 'member';
+  if (myRole !== 'owner') {
+    // Projeye bağlı takımlarda kullanıcının rolünü kontrol et
+    const teamMember = await prisma.teamMember.findFirst({
+      where: {
+        userId,
+        team: { projects: { some: { projectId: id } } },
+        role: { in: ['owner', 'admin'] },
+      },
+    });
+    if (teamMember) myRole = teamMember.role as 'admin';
+  }
+
+  return NextResponse.json({ project, myRole });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
